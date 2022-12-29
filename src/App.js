@@ -8,7 +8,10 @@ import { useState } from 'react';
 function App() {
   const [client_id, setClientID] = useState('CKSandbox-83859d3c-38b0-4bd8-8b15-d60fa0d5eb0e');
   const [secret_key, setSecretKey] = useState('SKSandbox-ac8ab570-54de-403e-bbd3-a2ef638dc6fe');
+  const [base_url, setBase_url] = useState('https://api-dev.ayolinx.id');
   const [va_request_data, setVARequestData] = useState({
+    request_id: '',
+    type: '',
     fullname: '',
     phone_number: '',
     email: '',
@@ -30,8 +33,6 @@ function App() {
   }
 
   async function payVA() {
-    const base_url = 'http://localhost:3009';
-    const payment_id = '123';
     const target_url = '/transaction/va/initiate';
     const iso_ts = moment().toISOString();
     try {
@@ -39,9 +40,9 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
           'Client-Id': client_id,
-          'Request-Id': payment_id,
+          'Request-Id': va_request_data.request_id,
           'Request-Timestamp': iso_ts,
-          'Signature': createSignature(payment_id, target_url, va_request_data, iso_ts)
+          'Signature': createSignature(va_request_data.request_id, target_url, va_request_data, iso_ts)
         }
       });
       setVANumber(y.data.data.va_number);
@@ -59,6 +60,10 @@ function App() {
       <Text fontWeight={700}>
         VA Payment Sample
       </Text>
+      <Input
+        value={base_url}
+        onChange={e => setBase_url(e.target.value)}
+        placeholder={'Base Url'} />
       <Input 
         value={client_id}
         onChange={e => setClientID(e.target.value)}
@@ -67,6 +72,14 @@ function App() {
         value={secret_key}
         onChange={e => setSecretKey(e.target.value)}
         placeholder={'Client Secret'} />
+      <Input
+        value={va_request_data.request_id}
+        onChange={e => setVARequestData({ ...va_request_data, request_id: e.target.value })}
+        placeholder={'Request-id'} />
+      <Input
+        value={va_request_data.type}
+        onChange={e => setVARequestData({ ...va_request_data, type: e.target.value })}
+        placeholder={'type'} />
       <Input 
         value={va_request_data.fullname}
         onChange={e => setVARequestData({ ...va_request_data, fullname: e.target.value })}
